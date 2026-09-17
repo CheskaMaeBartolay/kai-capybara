@@ -154,7 +154,7 @@ async function loadRobloxPresence() {
 
 // Initial Call & Event Listeners
 loadRobloxPresence();
-setInterval(loadRobloxPresence, 30000);
+setInterval(loadRobloxPresence, 2000);
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
