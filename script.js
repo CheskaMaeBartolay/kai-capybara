@@ -30,6 +30,8 @@ const gameLinks = {
     "https://www.roblox.com/games/YOUR-NEON-GAME-ID"
 };
 
+let firstPresenceLoad = true;
+
 function showToast(message) {
   if (!toast) return;
 
@@ -81,10 +83,7 @@ function hideJoinButton() {
 }
 
 function showJoinButton(placeId) {
-  if (!placeId) {
-    hideJoinButton();
-    return;
-  }
+  if (!placeId) return;
 
   const gameUrl =
     `https://www.roblox.com/games/start?placeId=${placeId}`;
@@ -123,12 +122,11 @@ async function loadRobloxPresence() {
     const data = await response.json();
     const presence = data.userPresences?.[0];
 
-    hideJoinButton();
-
     if (!presence) {
       onlineStatus.textContent = "Offline";
       currentGame.textContent = "Not currently playing Roblox.";
       statusDot.className = "status-dot offline";
+      hideJoinButton();
       return;
     }
 
@@ -147,12 +145,10 @@ async function loadRobloxPresence() {
         presence.placeID ||
         presence.rootPlaceID;
 
-      console.log("Roblox presence:", presence);
-      console.log("Detected place ID:", placeId);
-
       if (placeId) {
         showJoinButton(placeId);
       } else {
+        hideJoinButton();
         currentGame.textContent =
           "Playing Roblox — Join unavailable";
       }
@@ -164,6 +160,7 @@ async function loadRobloxPresence() {
       onlineStatus.textContent = "In Roblox Studio";
       currentGame.textContent = "Currently developing in Roblox Studio.";
       statusDot.className = "status-dot studio";
+      hideJoinButton();
       return;
     }
 
@@ -171,12 +168,14 @@ async function loadRobloxPresence() {
       onlineStatus.textContent = "Online";
       currentGame.textContent = "Browsing Roblox.";
       statusDot.className = "status-dot online";
+      hideJoinButton();
       return;
     }
 
     onlineStatus.textContent = "Offline";
     currentGame.textContent = "Not currently playing Roblox.";
     statusDot.className = "status-dot offline";
+    hideJoinButton();
 
   } catch (error) {
     console.error("Roblox presence error:", error);
@@ -185,7 +184,13 @@ async function loadRobloxPresence() {
     currentGame.textContent = "Roblox activity could not be loaded.";
     statusDot.className = "status-dot offline";
 
-    hideJoinButton();
+    // Only hide it if this is the first failed request.
+    // During later refreshes, the existing button will remain visible.
+    if (firstPresenceLoad) {
+      hideJoinButton();
+    }
+  } finally {
+    firstPresenceLoad = false;
   }
 }
 
