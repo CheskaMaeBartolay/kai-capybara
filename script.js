@@ -8,6 +8,8 @@ const statusDot = document.getElementById("statusDot");
 const currentGameLink = document.getElementById("currentGameLink");
 const joinGameBtn = document.getElementById("joinGameBtn");
 
+const ROBLOX_USER_ID = 8685718614;
+
 async function loadRobloxPresence() {
   try {
     const response = await fetch(
@@ -84,8 +86,6 @@ async function loadRobloxPresence() {
     joinGameBtn.hidden = true;
   }
 }
-
-const ROBLOX_USER_ID = 8685718614;
 
 const gameLinks = {
   "ASMR Keyboard Tower":
