@@ -136,14 +136,19 @@ async function loadRobloxPresence() {
 
     if (presenceType === 2) {
       onlineStatus.textContent = "Currently Playing";
-
       currentGame.textContent =
         presence.lastLocation || "Playing a Roblox game";
 
       statusDot.className = "status-dot online";
 
-      // Roblox may provide either placeId or rootPlaceId.
-      const placeId = presence.placeId || presence.rootPlaceId;
+      const placeId =
+        presence.placeId ||
+        presence.rootPlaceId ||
+        presence.placeID ||
+        presence.rootPlaceID;
+
+      console.log("Roblox presence:", presence);
+      console.log("Detected place ID:", placeId);
 
       if (placeId) {
         showJoinButton(placeId);
