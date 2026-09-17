@@ -1,4 +1,3 @@
-
 const gamesGrid = document.getElementById("gamesGrid");
 const viewAllBtn = document.getElementById("viewAllBtn");
 const toast = document.getElementById("toast");
@@ -8,15 +7,27 @@ const currentGame = document.getElementById("currentGame");
 const statusDot = document.getElementById("statusDot");
 const joinGameBtn = document.getElementById("joinGameBtn");
 
+// Your friend's Roblox User ID
 const ROBLOX_USER_ID = 8685718614;
 
 const gameLinks = {
-  "ASMR Keyboard Tower": "https://www.roblox.com/games/95466577544785/ASMR-Pink-Keyboard-Tower",
-  "Garden Tycoon": "https://www.roblox.com/games/YOUR-GARDEN-GAME-ID",
-  "Anime Battle Arena": "https://www.roblox.com/games/YOUR-ANIME-GAME-ID",
-  "Car Dealership": "https://www.roblox.com/games/YOUR-CAR-GAME-ID",
-  "Island Survival": "https://www.roblox.com/games/YOUR-ISLAND-GAME-ID",
-  "Neon City": "https://www.roblox.com/games/YOUR-NEON-GAME-ID"
+  "ASMR Keyboard Tower":
+    "https://www.roblox.com/games/95466577544785/ASMR-Pink-Keyboard-Tower",
+
+  "Garden Tycoon":
+    "https://www.roblox.com/games/YOUR-GARDEN-GAME-ID",
+
+  "Anime Battle Arena":
+    "https://www.roblox.com/games/YOUR-ANIME-GAME-ID",
+
+  "Car Dealership":
+    "https://www.roblox.com/games/YOUR-CAR-GAME-ID",
+
+  "Island Survival":
+    "https://www.roblox.com/games/YOUR-ISLAND-GAME-ID",
+
+  "Neon City":
+    "https://www.roblox.com/games/YOUR-NEON-GAME-ID"
 };
 
 function showToast(message) {
@@ -26,10 +37,10 @@ function showToast(message) {
   toast.classList.add("show");
 
   clearTimeout(window.toastTimer);
-  window.toastTimer = setTimeout(
-    () => toast.classList.remove("show"),
-    2800
-  );
+
+  window.toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2800);
 }
 
 viewAllBtn?.addEventListener("click", () => {
@@ -42,7 +53,7 @@ viewAllBtn?.addEventListener("click", () => {
     : 'View All <span>→</span>';
 });
 
-// Game card links — all six games are preserved.
+// Game card buttons
 document.querySelectorAll(".play-btn").forEach((button) => {
   button.addEventListener("click", () => {
     const game = button.dataset.game;
@@ -57,14 +68,12 @@ document.querySelectorAll(".play-btn").forEach((button) => {
   });
 });
 
-// Update the status card.
 function setPresenceStatus(label, game, state = "online") {
   if (onlineStatus) onlineStatus.textContent = label;
   if (currentGame) currentGame.textContent = game;
   if (statusDot) statusDot.className = `status-dot ${state}`;
 }
 
-// Hide the green Join Current Game button.
 function hideJoinGameButton() {
   if (!joinGameBtn) return;
 
@@ -73,7 +82,6 @@ function hideJoinGameButton() {
   joinGameBtn.removeAttribute("href");
 }
 
-// Show the green Join Current Game button.
 function showJoinGameButton(placeId) {
   if (!joinGameBtn || !placeId) return;
 
@@ -84,7 +92,6 @@ function showJoinGameButton(placeId) {
   joinGameBtn.style.display = "inline-flex";
 }
 
-// Load Roblox presence.
 async function loadRobloxPresence() {
   if (!onlineStatus || !currentGame || !statusDot) return;
 
@@ -92,7 +99,9 @@ async function loadRobloxPresence() {
     const response = await fetch(
       `/api/presence?userId=${ROBLOX_USER_ID}&t=${Date.now()}`,
       {
-        headers: { Accept: "application/json" },
+        headers: {
+          Accept: "application/json"
+        },
         cache: "no-store"
       }
     );
@@ -105,7 +114,6 @@ async function loadRobloxPresence() {
     const presence = data.userPresences?.[0];
     const presenceType = presence?.userPresenceType ?? 0;
 
-    // Reset the button before applying the new status.
     hideJoinGameButton();
 
     if (presenceType === 2) {
@@ -115,25 +123,21 @@ async function loadRobloxPresence() {
         "online"
       );
 
-      // Restore Join Current Game using the actual place ID.
       if (presence.placeId) {
         showJoinGameButton(presence.placeId);
       }
-
     } else if (presenceType === 3) {
       setPresenceStatus(
         "In Roblox Studio",
         "Currently developing a game.",
         "studio"
       );
-
     } else if (presenceType === 1) {
       setPresenceStatus(
         "Online",
         "Browsing Roblox",
         "online"
       );
-
     } else {
       setPresenceStatus(
         "Offline",
@@ -141,7 +145,6 @@ async function loadRobloxPresence() {
         "offline"
       );
     }
-
   } catch (error) {
     console.error("Roblox presence error:", error);
 
@@ -155,11 +158,10 @@ async function loadRobloxPresence() {
   }
 }
 
-// One refresh timer only.
 loadRobloxPresence();
+
 setInterval(loadRobloxPresence, 30000);
 
-// Refresh when returning to the tab or mobile app.
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
     loadRobloxPresence();
