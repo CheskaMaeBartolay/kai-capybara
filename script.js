@@ -68,8 +68,14 @@ async function loadRobloxPresence() {
       currentGame.textContent = presence.lastLocation || "Playing a Roblox game";
       statusDot.className = "status-dot online";
       const placeId = presence.placeId || presence.rootPlaceId;
+      const gameInstanceId = presence.gameId;
       if (placeId) {
-        joinGameBtn.href = `https://www.roblox.com/games/${placeId}`;
+        const joinUrl = new URL("https://www.roblox.com/games/start");
+        joinUrl.searchParams.set("placeId", placeId);
+        if (gameInstanceId) {
+          joinUrl.searchParams.set("gameInstanceId", gameInstanceId);
+        }
+        joinGameBtn.href = joinUrl.toString();
         joinGameBtn.style.display = "inline-flex";
       } else {
         hideJoinButton();
