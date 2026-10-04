@@ -8,6 +8,10 @@ const statusDot = document.getElementById("statusDot");
 const joinGameBtn = document.getElementById("joinGameBtn");
 
 const ROBLOX_USER_ID = 8685718614;
+<<<<<<< HEAD
+=======
+let firstPresenceLoad = true;
+>>>>>>> e0ffc37f498f6ce8aa69efc0053dda2630473b34
 
 const gameLinks = {
   "ASMR Keyboard Tower": "https://www.roblox.com/games/95466577544785/ASMR-Pink-Keyboard-Tower",
@@ -22,28 +26,51 @@ function showToast(message) {
   if (!toast) return;
   toast.textContent = message;
   toast.classList.add("show");
+<<<<<<< HEAD
   clearTimeout(window.toastTimer);
   window.toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+=======
+
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2800);
+>>>>>>> e0ffc37f498f6ce8aa69efc0053dda2630473b34
 }
 
 viewAllBtn?.addEventListener("click", () => {
   gamesGrid?.classList.toggle("show-all");
   const expanded = gamesGrid?.classList.contains("show-all");
+<<<<<<< HEAD
   viewAllBtn.innerHTML = expanded ? 'Show Less <span>↑</span>' : 'View All <span>→</span>';
+=======
+  viewAllBtn.innerHTML = expanded
+    ? 'Show Less <span>↑</span>'
+    : 'View All <span>→</span>';
+>>>>>>> e0ffc37f498f6ce8aa69efc0053dda2630473b34
 });
 
 document.querySelectorAll(".play-btn").forEach((button) => {
   button.addEventListener("click", () => {
     const game = button.dataset.game;
     const gameUrl = gameLinks[game];
+<<<<<<< HEAD
+=======
+
+>>>>>>> e0ffc37f498f6ce8aa69efc0053dda2630473b34
     if (!gameUrl || gameUrl.includes("YOUR-")) {
       showToast(`${game} link is not added yet.`);
       return;
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> e0ffc37f498f6ce8aa69efc0053dda2630473b34
     window.open(gameUrl, "_blank", "noopener,noreferrer");
   });
 });
 
+<<<<<<< HEAD
 async function loadRobloxPresence() {
   if (!onlineStatus || !currentGame || !statusDot || !joinGameBtn) return;
 
@@ -52,10 +79,44 @@ async function loadRobloxPresence() {
       headers: { Accept: "application/json" }
     });
     if (!response.ok) throw new Error("Presence API failed");
+=======
+function hideJoinButton() {
+  if (joinGameBtn) {
+    joinGameBtn.hidden = true;
+    joinGameBtn.style.display = "none";
+    joinGameBtn.removeAttribute("href");
+  }
+}
+
+function showJoinButton(placeId) {
+  if (!placeId || !joinGameBtn) return;
+  joinGameBtn.href = `https://www.roblox.com/games/start?placeId=${placeId}`;
+  joinGameBtn.hidden = false;
+  joinGameBtn.style.display = "inline-flex";
+}
+
+async function loadRobloxPresence() {
+  if (!onlineStatus || !currentGame || !statusDot) return;
+
+  try {
+    const response = await fetch(
+      `/api/presence?userId=${ROBLOX_USER_ID}&t=${Date.now()}`,
+      {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        cache: "no-store"
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Presence API failed: ${response.status}`);
+    }
+>>>>>>> e0ffc37f498f6ce8aa69efc0053dda2630473b34
 
     const data = await response.json();
     const presence = data.userPresences?.[0];
 
+<<<<<<< HEAD
     if (!presence || presence.userPresenceType === 0) {
       onlineStatus.textContent = "Offline";
       currentGame.textContent = "Not currently playing Roblox";
@@ -97,3 +158,81 @@ async function loadRobloxPresence() {
 
 loadRobloxPresence();
 setInterval(loadRobloxPresence, 30000);
+=======
+    if (!presence) {
+      onlineStatus.textContent = "Offline";
+      currentGame.textContent = "Not currently playing Roblox.";
+      statusDot.className = "status-dot offline";
+      hideJoinButton();
+      return;
+    }
+
+    const presenceType = Number(presence.userPresenceType);
+
+    if (presenceType === 2) {
+      onlineStatus.textContent = "Currently Playing";
+      currentGame.textContent = presence.lastLocation || "Playing a Roblox game";
+      statusDot.className = "status-dot online";
+
+      const placeId =
+        presence.placeId ||
+        presence.rootPlaceId ||
+        presence.placeID ||
+        presence.rootPlaceID;
+
+      if (placeId) {
+        showJoinButton(placeId);
+      } else {
+        hideJoinButton();
+        currentGame.textContent = "Playing Roblox — Join unavailable";
+      }
+      return;
+    }
+
+    if (presenceType === 3) {
+      onlineStatus.textContent = "In Roblox Studio";
+      currentGame.textContent = "Currently developing in Roblox Studio.";
+      statusDot.className = "status-dot studio";
+      hideJoinButton();
+      return;
+    }
+
+    if (presenceType === 1) {
+      onlineStatus.textContent = "Online";
+      currentGame.textContent = "Browsing Roblox.";
+      statusDot.className = "status-dot online";
+      hideJoinButton();
+      return;
+    }
+
+    onlineStatus.textContent = "Offline";
+    currentGame.textContent = "Not currently playing Roblox.";
+    statusDot.className = "status-dot offline";
+    hideJoinButton();
+
+  } catch (error) {
+    console.error("Roblox presence error:", error);
+    onlineStatus.textContent = "Status unavailable";
+    currentGame.textContent = "Roblox activity could not be loaded.";
+    statusDot.className = "status-dot offline";
+
+    if (firstPresenceLoad) {
+      hideJoinButton();
+    }
+  } finally {
+    firstPresenceLoad = false;
+  }
+}
+
+// Initial Call & Event Listeners
+loadRobloxPresence();
+setInterval(loadRobloxPresence, 2000);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    loadRobloxPresence();
+  }
+});
+
+window.addEventListener("pageshow", loadRobloxPresence);
+>>>>>>> e0ffc37f498f6ce8aa69efc0053dda2630473b34
