@@ -70,12 +70,11 @@ async function loadRobloxPresence() {
       const placeId = presence.placeId || presence.rootPlaceId;
       const gameInstanceId = presence.gameId;
       if (placeId) {
-        const joinUrl = new URL("https://www.roblox.com/games/start");
-        joinUrl.searchParams.set("placeId", placeId);
-        if (gameInstanceId) {
-          joinUrl.searchParams.set("gameInstanceId", gameInstanceId);
-        }
-        joinGameBtn.href = joinUrl.toString();
+        const placeParam = `placeId=${encodeURIComponent(placeId)}`;
+        const instanceParam = gameInstanceId
+          ? `&gameInstanceId=${encodeURIComponent(gameInstanceId)}`
+          : "";
+        joinGameBtn.href = `roblox://${placeParam}${instanceParam}`;
         joinGameBtn.style.display = "inline-flex";
       } else {
         hideJoinButton();
